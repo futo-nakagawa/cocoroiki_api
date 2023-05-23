@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Tokyo
+
+  app:
+    image: python:3.8
+    ports:
+      - 8080:8080
+    container_name: app
+    working_dir: /api
+    volumes:
+      - .:/api
+    command: >
+      sh -c "
+        pip install fastapi uvicorn
+        uvicorn main:app --reload --host 0.0.0.0 --port 8080
+      "
+
