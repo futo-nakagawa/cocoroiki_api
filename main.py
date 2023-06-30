@@ -21,33 +21,28 @@ def get_session():
         session.close()
 
 # ===============================AppUser=============================================
-@app.get("/app-users", response_model = List[schemas.AppUser], tags=["users ユーザー"])
+@app.get("/app-users", response_model = List[schemas.AppUserSchema.AppUser], tags=["users ユーザー"])
 def ユーザー一覧取得(session: Session = Depends(get_session)):
  
-    users_list = (session.query(models.AppUser).all()) # get all users items
+    users_list = session.query(models.AppUserModel.AppUser).all() # get all users items
  
     return users_list 
 
 
-@app.get("/app-users/{user_id}", response_model=schemas.AppUser, tags=["users ユーザー"])
-def 特定のユーザーの取得(user_id: int, session: Session = Depends(get_session)):
-    user = (
-        session.query(models.AppUser)
-        .options(joinedload(models.AppUser.family))  # Eager loading the 'family' relationship
-        .filter(models.AppUser.id == user_id)
-        .first()
-    )
+@app.get("/app-users/{id}", response_model=schemas.AppUserSchema.AppUser, tags=["users ユーザー"])
+def 特定のユーザーの取得(id: int, session: Session = Depends(get_session)):
+    user = session.query(models.AppUserModel.AppUser).get(id) # get item with the given id
 
     # Check if user exists
     if not user:
-        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
+        raise HTTPException(status_code=404, detail=f"User with id {id} not found")
 
     return user
  
-@app.post("/app-users", response_model=schemas.AppUser, status_code=status.HTTP_201_CREATED, tags=["users ユーザー"])
-def ユーザーの作成(users: schemas.AppUserCreate, session: Session = Depends(get_session)):
+@app.post("/app-users", response_model=schemas.AppUserSchema.AppUser, status_code=status.HTTP_201_CREATED, tags=["users ユーザー"])
+def ユーザーの作成(users: schemas.AppUserSchema.AppUserCreate, session: Session = Depends(get_session)):
 
-    usersdb = models.AppUser(
+    usersdb = models.AppUserModel.AppUser(
         name=users.name,
         email=users.email,
         password=users.password,
@@ -69,10 +64,10 @@ def ユーザーの作成(users: schemas.AppUserCreate, session: Session = Depen
     return usersdb
  
  
-@app.put("/app-users/{id}", response_model=schemas.AppUser, tags=["users ユーザー"])
-def 特定のユーザーの更新(id: int, users: schemas.AppUserCreate, session: Session = Depends(get_session)):
+@app.put("/app-users/{id}", response_model=schemas.AppUserSchema.AppUser, tags=["users ユーザー"])
+def 特定のユーザーの更新(id: int, users: schemas.AppUserSchema.AppUserCreate, session: Session = Depends(get_session)):
     # Check if the users item with the given id exists
-    existing_users = session.query(models.AppUser).get(id)
+    existing_users = session.query(models.AppUserModel.AppUser).get(id)
     if not existing_users:
         raise HTTPException(status_code=404, detail=f"users item with id {id} not found")
 
@@ -91,11 +86,11 @@ def 特定のユーザーの更新(id: int, users: schemas.AppUserCreate, sessio
 
     return existing_users
  
-@app.delete("/app-users/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["users ユーザー"])
+@app.delete("/app-users/{id}", tags=["users ユーザー"])
 def 特定のユーザーの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    users = session.query(models.AppUser).get(id)
+    users = session.query(models.AppUserModel.AppUser).get(id)
  
     # if users item with given id exists, delete it from the database. Otherwise raise 404 error
     if users:
@@ -107,18 +102,18 @@ def 特定のユーザーの削除(id: int, session: Session = Depends(get_sessi
     return None
 
 # ===============================Profile=============================================
-@app.get("/profiles", response_model = List[schemas.Profile], tags=["profiles プロファイル"])
+@app.get("/profiles", response_model = List[schemas.ProfileSchema.Profile], tags=["profiles プロファイル"])
 def プロファイル一覧取得(session: Session = Depends(get_session)):
  
-    profile_list = session.query(models.Profile).all() # get all profile items
+    profile_list = session.query(models.ProfileModel.Profile).all() # get all profile items
  
     return profile_list 
 
 
-@app.get("/profiles/{id}", response_model=schemas.Profile, tags=["profiles プロファイル"])
+@app.get("/profiles/{id}", response_model=schemas.ProfileSchema.Profile, tags=["profiles プロファイル"])
 def 特定のプロファイルの取得(id: int, session: Session = Depends(get_session)):
  
-    profile = session.query(models.Profile).get(id) # get item with the given id
+    profile = session.query(models.ProfileModel.Profile).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not profile:
@@ -126,10 +121,10 @@ def 特定のプロファイルの取得(id: int, session: Session = Depends(get
  
     return profile
  
-@app.post("/profiles", response_model=schemas.Profile, status_code=status.HTTP_201_CREATED, tags=["profiles プロファイル"])
-def プロファイルの作成(profile: schemas.ProfileCreate, session: Session = Depends(get_session)):
+@app.post("/profiles", response_model=schemas.ProfileSchema.Profile, status_code=status.HTTP_201_CREATED, tags=["profiles プロファイル"])
+def プロファイルの作成(profile: schemas.ProfileSchema.ProfileCreate, session: Session = Depends(get_session)):
  
-    profiledb = models.Profile(
+    profiledb = models.ProfileModel.Profile(
         name=profile.name,
         image=profile.image,
         content=profile.content
@@ -142,10 +137,10 @@ def プロファイルの作成(profile: schemas.ProfileCreate, session: Session
     return profiledb
  
  
-@app.put("/profiles/{id}", response_model=schemas.Profile, tags=["profiles プロファイル"])
-def 特定のプロファイルの更新(id: int, profile: schemas.ProfileCreate, session: Session = Depends(get_session)):
+@app.put("/profiles/{id}", response_model=schemas.ProfileSchema.Profile, tags=["profiles プロファイル"])
+def 特定のプロファイルの更新(id: int, profile: schemas.ProfileSchema.ProfileCreate, session: Session = Depends(get_session)):
     # Check if the profile item with the given id exists
-    existing_profile = session.query(models.Profile).get(id)
+    existing_profile = session.query(models.ProfileModel.Profile).get(id)
     if not existing_profile:
         raise HTTPException(status_code=404, detail=f"profile item with id {id} not found")
 
@@ -159,11 +154,11 @@ def 特定のプロファイルの更新(id: int, profile: schemas.ProfileCreate
 
     return existing_profile
  
-@app.delete("/profiles/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["profiles プロファイル"])
+@app.delete("/profiles/{id}", tags=["profiles プロファイル"])
 def 特定のプロファイルの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    profile = session.query(models.Profile).get(id)
+    profile = session.query(models.ProfileModel.Profile).get(id)
  
     # if profile item with given id exists, delete it from the database. Otherwise raise 404 error
     if profile:
@@ -175,18 +170,18 @@ def 特定のプロファイルの削除(id: int, session: Session = Depends(get
     return None
 
 # ===============================Family=============================================
-@app.get("/families", response_model = List[schemas.Family], tags=["families 家族"])
+@app.get("/families", response_model = List[schemas.FamilySchema.Family], tags=["families 家族"])
 def 家族一覧取得(session: Session = Depends(get_session)):
  
-    family_list = session.query(models.Family).all() # get all family items
+    family_list = session.query(models.FamilyModel.Family).all() # get all family items
  
     return family_list 
 
 
-@app.get("/families/{id}", response_model=schemas.Family, tags=["families 家族"])
+@app.get("/families/{id}", response_model=schemas.FamilySchema.Family, tags=["families 家族"])
 def 特定の家族の取得(id: int, session: Session = Depends(get_session)):
  
-    family = session.query(models.Family).get(id) # get item with the given id
+    family = session.query(models.FamilyModel.Family).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not family:
@@ -194,10 +189,10 @@ def 特定の家族の取得(id: int, session: Session = Depends(get_session)):
  
     return family
  
-@app.post("/families", response_model=schemas.Family, status_code=status.HTTP_201_CREATED, tags=["families 家族"])
-def 家族の作成(family: schemas.FamilyCreate, session: Session = Depends(get_session)):
+@app.post("/families", response_model=schemas.FamilySchema.Family, status_code=status.HTTP_201_CREATED, tags=["families 家族"])
+def 家族の作成(family: schemas.FamilySchema.FamilyCreate, session: Session = Depends(get_session)):
  
-    familydb = models.Family(
+    familydb = models.FamilyModel.Family(
         name=family.name,
         createdAt=datetime.today(),
         updatedAt=datetime.today()
@@ -210,10 +205,10 @@ def 家族の作成(family: schemas.FamilyCreate, session: Session = Depends(get
     return familydb
  
  
-@app.put("/families/{id}", response_model=schemas.Family, tags=["families 家族"])
-def 特定の家族の更新(id: int, family: schemas.FamilyCreate, session: Session = Depends(get_session)):
+@app.put("/families/{id}", response_model=schemas.FamilySchema.Family, tags=["families 家族"])
+def 特定の家族の更新(id: int, family: schemas.FamilySchema.FamilyCreate, session: Session = Depends(get_session)):
     # Check if the family item with the given id exists
-    existing_family = session.query(models.Family).get(id)
+    existing_family = session.query(models.FamilyModel.Family).get(id)
     if not existing_family:
         raise HTTPException(status_code=404, detail=f"family item with id {id} not found")
 
@@ -225,11 +220,11 @@ def 特定の家族の更新(id: int, family: schemas.FamilyCreate, session: Ses
 
     return existing_family
  
-@app.delete("/families/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["families 家族"])
+@app.delete("/families/{id}", tags=["families 家族"])
 def 特定の家族の削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    family = session.query(models.Family).get(id)
+    family = session.query(models.FamilyModel.Family).get(id)
  
     # if family item with given id exists, delete it from the database. Otherwise raise 404 error
     if family:
@@ -241,18 +236,18 @@ def 特定の家族の削除(id: int, session: Session = Depends(get_session)):
     return None
 
 # ===============================Post=============================================
-@app.get("/posts", response_model = List[schemas.Post], tags=["posts"])
+@app.get("/posts", response_model = List[schemas.PostSchema.Post], tags=["posts"])
 def 投稿一覧取得(session: Session = Depends(get_session)):
  
-    post_list = session.query(models.Post).all() # get all post items
+    post_list = session.query(models.PostModel.Post).all() # get all post items
  
     return post_list 
 
 
-@app.get("/posts/{id}", response_model=schemas.Post, tags=["posts"])
+@app.get("/posts/{id}", response_model=schemas.PostSchema.Post, tags=["posts"])
 def 特定の投稿の取得(id: int, session: Session = Depends(get_session)):
  
-    post = session.query(models.Post).get(id) # get item with the given id
+    post = session.query(models.PostModel.Post).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not post:
@@ -260,10 +255,10 @@ def 特定の投稿の取得(id: int, session: Session = Depends(get_session)):
  
     return post
  
-@app.post("/posts", response_model=schemas.Post, status_code=status.HTTP_201_CREATED, tags=["posts"])
-def 投稿の作成(post: schemas.PostCreate, session: Session = Depends(get_session)):
+@app.post("/posts", response_model=schemas.PostSchema.Post, status_code=status.HTTP_201_CREATED, tags=["posts"])
+def 投稿の作成(post: schemas.PostSchema.PostCreate, session: Session = Depends(get_session)):
  
-    postdb = models.Post(
+    postdb = models.PostModel.Post(
         user_id=post.user_id,
         kids=post.kids,
         content=post.content,
@@ -281,10 +276,10 @@ def 投稿の作成(post: schemas.PostCreate, session: Session = Depends(get_ses
     return postdb
  
  
-@app.put("/posts/{id}", response_model=schemas.Post, tags=["posts"])
-def 特定の投稿の更新(id: int, post: schemas.PostCreate, session: Session = Depends(get_session)):
+@app.put("/posts/{id}", response_model=schemas.PostSchema.Post, tags=["posts"])
+def 特定の投稿の更新(id: int, post: schemas.PostSchema.PostCreate, session: Session = Depends(get_session)):
     # Check if the post item with the given id exists
-    existing_post = session.query(models.Post).get(id)
+    existing_post = session.query(models.PostModel.Post).get(id)
     if not existing_post:
         raise HTTPException(status_code=404, detail=f"Post item with id {id} not found")
 
@@ -300,11 +295,11 @@ def 特定の投稿の更新(id: int, post: schemas.PostCreate, session: Session
 
     return existing_post
  
-@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["posts"])
+@app.delete("/posts/{id}", tags=["posts"])
 def 特定の投稿の削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    post = session.query(models.Post).get(id)
+    post = session.query(models.PostModel.Post).get(id)
  
     # if post item with given id exists, delete it from the database. Otherwise raise 404 error
     if post:
@@ -317,18 +312,18 @@ def 特定の投稿の削除(id: int, session: Session = Depends(get_session)):
 
 
 # ===============================Comment=============================================
-@app.get("/comments", response_model = List[schemas.Comment], tags=["comments"])
+@app.get("/comments", response_model = List[schemas.CommentSchema.Comment], tags=["comments"])
 def コメント一覧取得(session: Session = Depends(get_session)):
  
-    comment_list = session.query(models.Comment).all() # get all Comment items
+    comment_list = session.query(models.CommentModel.Comment).all() # get all Comment items
  
     return comment_list 
 
 
-@app.get("/comments/{id}", response_model=schemas.Comment, tags=["comments"])
+@app.get("/comments/{id}", response_model=schemas.CommentSchema.Comment, tags=["comments"])
 def 特定のコメントの取得(id: int, session: Session = Depends(get_session)):
  
-    comment = session.query(models.Comment).get(id) # get item with the given id
+    comment = session.query(models.CommentModel.Comment).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not comment:
@@ -336,10 +331,10 @@ def 特定のコメントの取得(id: int, session: Session = Depends(get_sessi
  
     return comment
  
-@app.post("/comments", response_model=schemas.Comment, status_code=status.HTTP_201_CREATED, tags=["comments"])
-def コメントの作成(comment: schemas.CommentCreate, session: Session = Depends(get_session)):
+@app.post("/comments", response_model=schemas.CommentSchema.Comment, status_code=status.HTTP_201_CREATED, tags=["comments"])
+def コメントの作成(comment: schemas.CommentSchema.CommentCreate, session: Session = Depends(get_session)):
  
-    commentdb = models.Comment(
+    commentdb = models.CommentModel.Comment(
         parent_id = comment.parent_id,
         post_id = comment.post_id,
         user_id = comment.user_id,
@@ -354,10 +349,10 @@ def コメントの作成(comment: schemas.CommentCreate, session: Session = Dep
     return commentdb
  
  
-@app.put("/comments/{id}", response_model=schemas.Comment, tags=["comments"])
-def 特定のコメントの更新(id: int, comment: schemas.CommentCreate, session: Session = Depends(get_session)):
+@app.put("/comments/{id}", response_model=schemas.CommentSchema.Comment, tags=["comments"])
+def 特定のコメントの更新(id: int, comment: schemas.CommentSchema.CommentCreate, session: Session = Depends(get_session)):
     # Check if the comment item with the given id exists
-    existing_comment = session.query(models.Comment).get(id)
+    existing_comment = session.query(models.CommentModel.Comment).get(id)
     if not existing_comment:
         raise HTTPException(status_code=404, detail=f"Comment item with id {id} not found")
 
@@ -372,11 +367,11 @@ def 特定のコメントの更新(id: int, comment: schemas.CommentCreate, sess
 
     return existing_comment
  
-@app.delete("/comments/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["comments"])
+@app.delete("/comments/{id}", tags=["comments"])
 def 特定のコメントの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    comment = session.query(models.Comment).get(id)
+    comment = session.query(models.CommentModel.Comment).get(id)
  
     # if comment item with given id exists, delete it from the database. Otherwise raise 404 error
     if comment:
@@ -389,18 +384,18 @@ def 特定のコメントの削除(id: int, session: Session = Depends(get_sessi
 
  
 # ===============================Tree=============================================
-@app.get("/trees", response_model = List[schemas.Tree], tags=["trees"])
+@app.get("/trees", response_model = List[schemas.TreeSchema.Tree], tags=["trees"])
 def 木一覧取得(session: Session = Depends(get_session)):
  
-    tree_list = session.query(models.Tree).all() # get all Tree items
+    tree_list = session.query(models.TreeModel.Tree).all() # get all Tree items
  
     return tree_list 
 
 
-@app.get("/trees/{id}", response_model=schemas.Tree, tags=["trees"])
+@app.get("/trees/{id}", response_model=schemas.TreeSchema.Tree, tags=["trees"])
 def 特定の木の取得(id: int, session: Session = Depends(get_session)):
  
-    tree = session.query(models.Tree).get(id) # get item with the given id
+    tree = session.query(models.TreeModel.Tree).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not tree:
@@ -408,10 +403,10 @@ def 特定の木の取得(id: int, session: Session = Depends(get_session)):
  
     return tree
  
-@app.post("/trees", response_model=schemas.Tree, status_code=status.HTTP_201_CREATED, tags=["trees"])
-def 木の作成(tree: schemas.TreeCreate, session: Session = Depends(get_session)):
+@app.post("/trees", response_model=schemas.TreeSchema.Tree, status_code=status.HTTP_201_CREATED, tags=["trees"])
+def 木の作成(tree: schemas.TreeSchema.TreeCreate, session: Session = Depends(get_session)):
  
-    treedb = models.Tree(
+    treedb = models.TreeModel.Tree(
         growth_stage = tree.growth_stage,
         quest = tree.quest,
         watering = datetime.today()
@@ -424,10 +419,10 @@ def 木の作成(tree: schemas.TreeCreate, session: Session = Depends(get_sessio
     return treedb
  
  
-@app.put("/trees/{id}", response_model=schemas.Tree, tags=["trees"])
-def 特定の木の更新(id: int, tree: schemas.TreeCreate, session: Session = Depends(get_session)):
+@app.put("/trees/{id}", response_model=schemas.TreeSchema.Tree, tags=["trees"])
+def 特定の木の更新(id: int, tree: schemas.TreeSchema.TreeCreate, session: Session = Depends(get_session)):
     # Check if the tree item with the given id exists
-    existing_tree = session.query(models.Tree).get(id)
+    existing_tree = session.query(models.TreeModel.Tree).get(id)
     if not existing_tree:
         raise HTTPException(status_code=404, detail=f"Tree item with id {id} not found")
 
@@ -440,11 +435,11 @@ def 特定の木の更新(id: int, tree: schemas.TreeCreate, session: Session = 
 
     return existing_tree
  
-@app.delete("/trees/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["trees"])
+@app.delete("/trees/{id}", tags=["trees"])
 def 特定の木の削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    tree = session.query(models.Tree).get(id)
+    tree = session.query(models.TreeModel.Tree).get(id)
  
     # if tree item with given id exists, delete it from the database. Otherwise raise 404 error
     if tree:
@@ -457,18 +452,18 @@ def 特定の木の削除(id: int, session: Session = Depends(get_session)):
 
  
 # ===============================QuestType=============================================
-@app.get("/quest_types", response_model = List[schemas.QuestType], tags=["quest_types"])
+@app.get("/quest_types", response_model = List[schemas.QuestTypeSchema.QuestType], tags=["quest_types"])
 def クエストタイプ一覧取得(session: Session = Depends(get_session)):
  
-    questtype_list = session.query(models.QuestType).all() # get all QuestType items
+    questtype_list = session.query(models.QuestTypeModel.QuestType).all() # get all QuestType items
  
     return questtype_list 
 
 
-@app.get("/quest_types/{id}", response_model=schemas.QuestType, tags=["quest_types"])
+@app.get("/quest_types/{id}", response_model=schemas.QuestTypeSchema.QuestType, tags=["quest_types"])
 def 特定のクエストタイプの取得(id: int, session: Session = Depends(get_session)):
  
-    questtype = session.query(models.QuestType).get(id) # get item with the given id
+    questtype = session.query(models.QuestTypeModel.QuestType).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not questtype:
@@ -476,10 +471,10 @@ def 特定のクエストタイプの取得(id: int, session: Session = Depends(
  
     return questtype
  
-@app.post("/quest_types", response_model=schemas.QuestType, status_code=status.HTTP_201_CREATED, tags=["quest_types"])
-def クエストタイプの作成(questtype: schemas.QuestTypeCreate, session: Session = Depends(get_session)):
+@app.post("/quest_types", response_model=schemas.QuestTypeSchema.QuestType, status_code=status.HTTP_201_CREATED, tags=["quest_types"])
+def クエストタイプの作成(questtype: schemas.QuestTypeSchema.QuestTypeCreate, session: Session = Depends(get_session)):
  
-    questtypedb = models.QuestType(
+    questtypedb = models.QuestTypeModel.QuestType(
         kinds = questtype.kinds,
         online = questtype.online
     )
@@ -491,10 +486,10 @@ def クエストタイプの作成(questtype: schemas.QuestTypeCreate, session: 
     return questtypedb
  
  
-@app.put("/quest_types/{id}", response_model=schemas.QuestType, tags=["quest_types"])
-def 特定のクエストタイプの更新(id: int, questtype: schemas.QuestTypeCreate, session: Session = Depends(get_session)):
+@app.put("/quest_types/{id}", response_model=schemas.QuestTypeSchema.QuestType, tags=["quest_types"])
+def 特定のクエストタイプの更新(id: int, questtype: schemas.QuestTypeSchema.QuestTypeCreate, session: Session = Depends(get_session)):
     # Check if the questtype item with the given id exists
-    existing_tree = session.query(models.QuestType).get(id)
+    existing_tree = session.query(models.QuestTypeModel.QuestType).get(id)
     if not existing_tree:
         raise HTTPException(status_code=404, detail=f"QuestType item with id {id} not found")
 
@@ -507,11 +502,11 @@ def 特定のクエストタイプの更新(id: int, questtype: schemas.QuestTyp
 
     return existing_tree
  
-@app.delete("/quest_types/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["quest_types"])
+@app.delete("/quest_types/{id}", tags=["quest_types"])
 def 特定のクエストタイプの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    questtype = session.query(models.QuestType).get(id)
+    questtype = session.query(models.QuestTypeModel.QuestType).get(id)
  
     # if questtype item with given id exists, delete it from the database. Otherwise raise 404 error
     if questtype:
@@ -524,18 +519,18 @@ def 特定のクエストタイプの削除(id: int, session: Session = Depends(
 
  
 # ===============================Reward=============================================
-@app.get("/rewards", response_model = List[schemas.Reward], tags=["rewards"])
+@app.get("/rewards", response_model = List[schemas.RewardSchema.Reward], tags=["rewards"])
 def 褒美一覧取得(session: Session = Depends(get_session)):
  
-    reward_list = session.query(models.Reward).all() # get all Reward items
+    reward_list = session.query(models.RewardModel.Reward).all() # get all Reward items
  
     return reward_list 
 
 
-@app.get("/rewards/{id}", response_model=schemas.Reward, tags=["rewards"])
+@app.get("/rewards/{id}", response_model=schemas.RewardSchema.Reward, tags=["rewards"])
 def 特定の褒美の取得(id: int, session: Session = Depends(get_session)):
  
-    reward = session.query(models.Reward).get(id) # get item with the given id
+    reward = session.query(models.RewardModel.Reward).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not reward:
@@ -543,10 +538,10 @@ def 特定の褒美の取得(id: int, session: Session = Depends(get_session)):
  
     return reward
  
-@app.post("/rewards", response_model=schemas.Reward, status_code=status.HTTP_201_CREATED, tags=["rewards"])
-def 褒美の作成(reward: schemas.RewardCreate, session: Session = Depends(get_session)):
+@app.post("/rewards", response_model=schemas.RewardSchema.Reward, status_code=status.HTTP_201_CREATED, tags=["rewards"])
+def 褒美の作成(reward: schemas.RewardSchema.RewardCreate, session: Session = Depends(get_session)):
  
-    rewarddb = models.Reward(
+    rewarddb = models.RewardModel.Reward(
         content = reward.content
     )
 
@@ -557,10 +552,10 @@ def 褒美の作成(reward: schemas.RewardCreate, session: Session = Depends(get
     return rewarddb
  
  
-@app.put("/rewards/{id}", response_model=schemas.Reward, tags=["rewards"])
-def 特定の褒美の更新(id: int, reward: schemas.RewardCreate, session: Session = Depends(get_session)):
+@app.put("/rewards/{id}", response_model=schemas.RewardSchema.Reward, tags=["rewards"])
+def 特定の褒美の更新(id: int, reward: schemas.RewardSchema.RewardCreate, session: Session = Depends(get_session)):
     # Check if the reward item with the given id exists
-    existing_reward = session.query(models.Reward).get(id)
+    existing_reward = session.query(models.RewardModel.Reward).get(id)
     if not existing_reward:
         raise HTTPException(status_code=404, detail=f"Reward item with id {id} not found")
 
@@ -572,11 +567,11 @@ def 特定の褒美の更新(id: int, reward: schemas.RewardCreate, session: Ses
 
     return existing_reward
  
-@app.delete("/rewards/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["rewards"])
+@app.delete("/rewards/{id}", tags=["rewards"])
 def 特定の褒美の削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    reward = session.query(models.Reward).get(id)
+    reward = session.query(models.RewardModel.Reward).get(id)
  
     # if reward item with given id exists, delete it from the database. Otherwise raise 404 error
     if reward:
@@ -589,18 +584,18 @@ def 特定の褒美の削除(id: int, session: Session = Depends(get_session)):
 
  
 # ===============================Quest=============================================
-@app.get("/quests", response_model = List[schemas.Quest], tags=["quests"])
+@app.get("/quests", response_model = List[schemas.QuestSchema.Quest], tags=["quests"])
 def クエスト一覧取得(session: Session = Depends(get_session)):
  
-    quests_list = session.query(models.Quest).all() # get all quests items
+    quests_list = session.query(models.QuestModel.Quest).all() # get all quests items
  
     return quests_list 
 
 
-@app.get("/quests/{id}", response_model=schemas.Quest, tags=["quests"])
+@app.get("/quests/{id}", response_model=schemas.QuestSchema.Quest, tags=["quests"])
 def 特定のクエストの取得(id: int, session: Session = Depends(get_session)):
  
-    quests = session.query(models.Quest).get(id) # get item with the given id
+    quests = session.query(models.QuestModel.Quest).get(id) # get item with the given id
  
     # check if id exists. If not, return 404 not found response
     if not quests:
@@ -608,10 +603,10 @@ def 特定のクエストの取得(id: int, session: Session = Depends(get_sessi
  
     return quests
  
-@app.post("/quests", response_model=schemas.Quest, status_code=status.HTTP_201_CREATED, tags=["quests"])
-def クエストの作成(quests: schemas.QuestCreate, session: Session = Depends(get_session)):
+@app.post("/quests", response_model=schemas.QuestSchema.Quest, status_code=status.HTTP_201_CREATED, tags=["quests"])
+def クエストの作成(quests: schemas.QuestSchema.QuestCreate, session: Session = Depends(get_session)):
  
-    questsdb = models.Quest(
+    questsdb = models.QuestModel.Quest(
         content=quests.content,
         quest_kinds=quests.quest_kinds,
         completed=quests.completed
@@ -624,10 +619,10 @@ def クエストの作成(quests: schemas.QuestCreate, session: Session = Depend
     return questsdb
  
  
-@app.put("/quests/{id}", response_model=schemas.Quest, tags=["quests"])
-def 特定のクエストの更新(id: int, quests: schemas.QuestCreate, session: Session = Depends(get_session)):
+@app.put("/quests/{id}", response_model=schemas.QuestSchema.Quest, tags=["quests"])
+def 特定のクエストの更新(id: int, quests: schemas.QuestSchema.QuestCreate, session: Session = Depends(get_session)):
     # Check if the quests item with the given id exists
-    existing_quests = session.query(models.Quest).get(id)
+    existing_quests = session.query(models.QuestModel.Quest).get(id)
     if not existing_quests:
         raise HTTPException(status_code=404, detail=f"quests item with id {id} not found")
 
@@ -641,11 +636,11 @@ def 特定のクエストの更新(id: int, quests: schemas.QuestCreate, session
 
     return existing_quests
  
-@app.delete("/quests/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["quests"])
+@app.delete("/quests/{id}", tags=["quests"])
 def 特定のクエストの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    quests = session.query(models.Quest).get(id)
+    quests = session.query(models.QuestModel.Quest).get(id)
  
     # if quests item with given id exists, delete it from the database. Otherwise raise 404 error
     if quests:
@@ -657,17 +652,17 @@ def 特定のクエストの削除(id: int, session: Session = Depends(get_sessi
     return None
  
 # ===============================Closeness=============================================
-@app.get("/closeness", response_model = List[schemas.Closeness], tags=["closeness"])
+@app.get("/closeness", response_model = List[schemas.ClosenessSchema.Closeness], tags=["closeness"])
 def Closenessの一覧取得(session: Session = Depends(get_session)):
  
-    closeness_list = (session.query(models.Closeness).all()) # get all closeness items
+    closeness_list = (session.query(models.ClosenessModel.Closeness).all()) # get all closeness items
  
     return closeness_list 
 
 
-@app.get("/closeness/{id}", response_model=schemas.Closeness, tags=["closeness"])
+@app.get("/closeness/{id}", response_model=schemas.ClosenessSchema.Closeness, tags=["closeness"])
 def 特定のClosenessを取得(id: int, session: Session = Depends(get_session)):
-    close = session.query(models.Closeness).get(id) # get item with the given id
+    close = session.query(models.ClosenessModel.Closeness).get(id) # get item with the given id
 
     # Check if close exists
     if not close:
@@ -675,10 +670,10 @@ def 特定のClosenessを取得(id: int, session: Session = Depends(get_session)
 
     return close
  
-@app.post("/closeness", response_model=schemas.Closeness, status_code=status.HTTP_201_CREATED, tags=["closeness"])
-def Closenessの作成(closeness: schemas.ClosenessCreate, session: Session = Depends(get_session)):
+@app.post("/closeness", response_model=schemas.ClosenessSchema.Closeness, status_code=status.HTTP_201_CREATED, tags=["closeness"])
+def Closenessの作成(closeness: schemas.ClosenessSchema.ClosenessCreate, session: Session = Depends(get_session)):
 
-    closenessdb = models.Closeness(
+    closenessdb = models.ClosenessModel.Closeness(
         tree_id=closeness.tree_id,
         close_meter=closeness.close_meter,
     )
@@ -690,10 +685,10 @@ def Closenessの作成(closeness: schemas.ClosenessCreate, session: Session = De
     return closenessdb
  
  
-@app.put("/closeness/{id}", response_model=schemas.Closeness, tags=["closeness"])
-def 特定のClosenessの更新(id: int, closeness: schemas.ClosenessCreate, session: Session = Depends(get_session)):
+@app.put("/closeness/{id}", response_model=schemas.ClosenessSchema.Closeness, tags=["closeness"])
+def 特定のClosenessの更新(id: int, closeness: schemas.ClosenessSchema.ClosenessCreate, session: Session = Depends(get_session)):
     # Check if the closeness item with the given id exists
-    existing_closeness = session.query(models.Closeness).get(id)
+    existing_closeness = session.query(models.ClosenessModel.Closeness).get(id)
     if not existing_closeness:
         raise HTTPException(status_code=404, detail=f"Closeness item with id {id} not found")
 
@@ -706,11 +701,11 @@ def 特定のClosenessの更新(id: int, closeness: schemas.ClosenessCreate, ses
 
     return existing_closeness
  
-@app.delete("/closeness/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["closeness"])
+@app.delete("/closeness/{id}", tags=["closeness"])
 def 特定のClosenessの削除(id: int, session: Session = Depends(get_session)):
  
     # get the given id
-    closeness = session.query(models.Closeness).get(id)
+    closeness = session.query(models.ClosenessModel.Closeness).get(id)
  
     # if closeness item with given id exists, delete it from the database. Otherwise raise 404 error
     if closeness:
