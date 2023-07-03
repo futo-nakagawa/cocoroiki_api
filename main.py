@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 import models
 import schemas
+from AppUser import controller as appcontrol
  
 Base.metadata.create_all(engine) # Create the database
  
@@ -22,84 +23,30 @@ def get_session():
 
 # ===============================AppUser=============================================
 @app.get("/app-users", response_model = List[schemas.AppUserSchema.AppUser], tags=["users ユーザー"])
-def ユーザー一覧取得(session: Session = Depends(get_session)):
- 
-    users_list = session.query(models.AppUserModel.AppUser).all() # get all users items
- 
-    return users_list 
-
+def ユーザー一覧取得(session: Session = Depends(get_session)): 
+    alluser = appcontrol.get_user(session)
+    return alluser
 
 @app.get("/app-users/{id}", response_model=schemas.AppUserSchema.AppUser, tags=["users ユーザー"])
 def 特定のユーザーの取得(id: int, session: Session = Depends(get_session)):
-    user = session.query(models.AppUserModel.AppUser).get(id) # get item with the given id
-
-    # Check if user exists
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with id {id} not found")
-
-    return user
+    userbyID = appcontrol.get_user_by_id(session, id=id)
+    return userbyID
  
 @app.post("/app-users", response_model=schemas.AppUserSchema.AppUser, status_code=status.HTTP_201_CREATED, tags=["users ユーザー"])
 def ユーザーの作成(users: schemas.AppUserSchema.AppUserCreate, session: Session = Depends(get_session)):
-
-    usersdb = models.AppUserModel.AppUser(
-        name=users.name,
-        email=users.email,
-        password=users.password,
-        birth=users.birth,
-        age=users.age,
-        gender=users.gender,
-        quest_role=users.quest_role,
-        family_id=users.family_id,
-        last_login=datetime.today(),
-        createdAt=datetime.today(),
-        updatedAt=datetime.today(),
-        publishedAt=datetime.today()
-    )
- 
-    session.add(usersdb)
-    session.commit()
-    session.refresh(usersdb)
-
-    return usersdb
- 
+    createuser = appcontrol.create_user(session, users=users)
+    return createuser 
  
 @app.put("/app-users/{id}", response_model=schemas.AppUserSchema.AppUser, tags=["users ユーザー"])
 def 特定のユーザーの更新(id: int, users: schemas.AppUserSchema.AppUserCreate, session: Session = Depends(get_session)):
-    # Check if the users item with the given id exists
-    existing_users = session.query(models.AppUserModel.AppUser).get(id)
-    if not existing_users:
-        raise HTTPException(status_code=404, detail=f"users item with id {id} not found")
-
-    # Update the attributes of the existing_users with the values from the users parameter
-    existing_users.name = users.name
-    existing_users.email = users.email
-    existing_users.password = users.password
-    existing_users.birth = users.birth
-    existing_users.age = users.age
-    existing_users.gender = users.gender
-    existing_users.quest_role = users.quest_role
-    existing_users.family_id = users.family_id
-
-    session.commit()
-    session.refresh(existing_users)
-
-    return existing_users
+    updateuser =appcontrol.update_user(session, users=users, id=id)
+    return updateuser
  
 @app.delete("/app-users/{id}", tags=["users ユーザー"])
 def 特定のユーザーの削除(id: int, session: Session = Depends(get_session)):
- 
-    # get the given id
-    users = session.query(models.AppUserModel.AppUser).get(id)
- 
-    # if users item with given id exists, delete it from the database. Otherwise raise 404 error
-    if users:
-        session.delete(users)
-        session.commit()
-    else:
-        raise HTTPException(status_code=404, detail=f"users item with id {id} not found")
- 
-    return None
+    deleteuser = appcontrol.delete_user(session, id=id)
+    return deleteuser
+
 
 # ===============================Profile=============================================
 @app.get("/profiles", response_model = List[schemas.ProfileSchema.Profile], tags=["profiles プロファイル"])
