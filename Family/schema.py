@@ -6,12 +6,13 @@ from datetime import datetime
 # Create Family Schema (Pydantic Model)
 class FamilyCreate(BaseModel):
     name: str
-    users: int
+    total: int
 
 # Complete Family Schema (Pydantic Model)
 class Family(BaseModel):
     id: int
     name: str
+    total: int
     createdAt: datetime = None
     updatedAt: datetime = None
 

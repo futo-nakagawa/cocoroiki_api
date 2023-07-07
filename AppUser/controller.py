@@ -29,6 +29,7 @@ def create_user(session: Session, users: schemas.AppUserSchema.AppUserCreate):
         gender=users.gender,
         quest_role=users.quest_role,
         family_id=users.family_id,
+        grandparent=users.grandparent,
         last_login=datetime.today(),
         createdAt=datetime.today(),
         updatedAt=datetime.today(),
@@ -57,6 +58,7 @@ def update_user(session: Session, users: schemas.AppUserSchema.AppUserCreate, id
     existing_users.gender = users.gender
     existing_users.quest_role = users.quest_role
     existing_users.family_id = users.family_id
+    existing_users.grandparent = users.grandparent
 
     session.commit()
     session.refresh(existing_users)

@@ -16,6 +16,7 @@ class AppUser(Base):
     gender = Column(String)
     quest_role = Column(Boolean)
     family_id = Column(Integer, ForeignKey('Families.id'))
+    grandparent = Column(Boolean)
     last_login = Column(DateTime)
     createdAt = Column(DateTime)
     updatedAt = Column(DateTime)

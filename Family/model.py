@@ -9,6 +9,7 @@ class Family(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    total = Column(Integer)
     createdAt = Column(DateTime)
     updatedAt = Column(DateTime)
 
