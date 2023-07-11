@@ -13,3 +13,4 @@ class Tree(Base):
     watering = Column(DateTime)
 
     closeness = relationship("Closeness", back_populates="tree")
+    tree_user = relationship("TreeUser", back_populates="tree")

@@ -9,3 +9,4 @@ from QuestType import model as QuestTypeModel
 from Reward import model as RewardModel
 from Tree import model as TreeModel
 from Relation import model as RelationModel
+from TreeUser import model as TreeUserModel

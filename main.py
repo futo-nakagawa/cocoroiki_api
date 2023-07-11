@@ -11,6 +11,7 @@ from Reward import router as reward_router
 from Quest import router as quest_router
 from Closeness import router as closeness_router
 from Relation import router as relation_router
+from TreeUser import router as tree_user_router
  
 Base.metadata.create_all(engine) # Create the database
  
@@ -49,3 +50,6 @@ app.include_router(closeness_router.router)
 
 # ===============================Relation==============================================
 app.include_router(relation_router.router)
+
+# ===============================TreeUser==============================================
+app.include_router(tree_user_router.router)
