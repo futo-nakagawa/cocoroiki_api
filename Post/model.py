@@ -18,3 +18,4 @@ class Post(Base):
     publishedAt = Column(DateTime)
 
     user = relationship("AppUser", back_populates="post")
+    comment = relationship("Comment", back_populates="post")

@@ -8,3 +8,4 @@ from Quest import schema as QuestSchema
 from QuestType import schema as QuestTypeSchema
 from Reward import schema as RewardSchema
 from Tree import schema as TreeSchema
+from Relation import schema as RelationSchema

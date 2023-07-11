@@ -24,3 +24,5 @@ class AppUser(Base):
 
     family = relationship("Family", back_populates="user")
     post = relationship("Post", back_populates="user")
+    relation = relationship("Relation", back_populates="user")
+    comment = relationship("Comment", back_populates="user")

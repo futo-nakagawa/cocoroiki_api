@@ -10,6 +10,7 @@ from QuestType import router as quest_type_router
 from Reward import router as reward_router
 from Quest import router as quest_router
 from Closeness import router as closeness_router
+from Relation import router as relation_router
  
 Base.metadata.create_all(engine) # Create the database
  
@@ -45,3 +46,6 @@ app.include_router(quest_router.router)
     
 # ===============================Closeness=============================================
 app.include_router(closeness_router.router)
+
+# ===============================Relation==============================================
+app.include_router(relation_router.router)

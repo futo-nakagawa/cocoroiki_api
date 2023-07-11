@@ -7,7 +7,7 @@ from QuestType import schema as schema
 # Create Quest Schema (Pydantic Model)
 class QuestCreate(BaseModel):
     content: int
-    quest_kinds: int
+    quest_kinds: int = None
     completed: bool
 
 # Complete Quest Schema (Pydantic Model)
@@ -15,7 +15,7 @@ class Quest(BaseModel):
     id: int
     content: int
     quest_kinds: int
-    quests: schema.QuestType
+    quests: schema.QuestType = None
     completed: bool
 
     class Config:

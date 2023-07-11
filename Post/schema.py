@@ -6,7 +6,7 @@ from AppUser import schema as schema
 # =================================Post===========================================
 # Create Post Schema (Pydantic Model)
 class PostCreate(BaseModel):
-    user_id: int
+    user_id: int = None
     kids: int
     content: str
     image_url: str
@@ -16,7 +16,7 @@ class PostCreate(BaseModel):
 class Post(BaseModel):
     id: int
     user_id: int
-    user: schema.AppUser
+    user: schema.AppUser = None
     kids: int
     content: str
     image_url: str

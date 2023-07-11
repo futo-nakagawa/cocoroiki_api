@@ -13,7 +13,7 @@ class AppUserCreate(BaseModel):
     age: int
     gender: str
     quest_role: bool
-    family_id: int
+    family_id: int = None
     grandparent: bool
 
 # Complete appUser Schema (Pydantic Model)
@@ -27,7 +27,7 @@ class AppUser(BaseModel):
     gender: str
     quest_role: bool
     family_id: int
-    family: schema.Family
+    family: schema.Family = None
     grandparent: bool
     last_login: datetime = None
     createdAt: datetime = None
