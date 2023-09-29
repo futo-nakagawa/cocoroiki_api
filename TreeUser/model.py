@@ -11,5 +11,5 @@ class TreeUser(Base):
     tree_id = Column(Integer, ForeignKey('Trees.id'))
     user_id = Column(Integer, ForeignKey('Users.id'))
 
-    tree = relationship("Tree", back_populates="tree_user")
-    user = relationship("AppUser", back_populates="tree_user")
+    # tree = relationship("Tree", back_populates="tree_user")
+    # user = relationship("AppUser", back_populates="tree_user")

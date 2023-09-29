@@ -14,5 +14,5 @@ class Comment(Base):
     content = Column(String)
     createdAt = Column(DateTime)
 
-    post = relationship("Post", back_populates="comment")
-    user = relationship("AppUser", back_populates="comment")
+    # post = relationship("Post", back_populates="comment")
+    # user = relationship("AppUser", back_populates="comment")

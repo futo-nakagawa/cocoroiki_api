@@ -9,7 +9,7 @@ from src.config import get_session
 router = APIRouter()
 
 # ===============================AppUser=============================================
-@router.get("/app-users", response_model = List[schemas.AppUserSchema.AppUser], tags=["users ユーザー"])
+@router.get("/api/app-users", tags=["users ユーザー"])
 def ユーザー一覧取得(session: Session = Depends(get_session)): 
     alluser = controller.get_user(session)
     return alluser

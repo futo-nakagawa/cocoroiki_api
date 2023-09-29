@@ -19,20 +19,20 @@ class AppUserCreate(BaseModel):
 # Complete appUser Schema (Pydantic Model)
 class AppUser(BaseModel):
     id: int
-    name: str
-    email: str
-    password: str
-    birth: int
-    age: int
-    gender: str
-    quest_role: bool
-    family_id: int
-    family: schema.Family = None
+    name: str = None
+    email: str = None
+    password: str = None
+    birth: int = None
+    age: int = None
+    gender: str = None
+    # quest_role: bool 
+    # family_id: int
+    # family: schema.Family = None
     grandparent: bool
     last_login: datetime = None
-    createdAt: datetime = None
-    updatedAt: datetime = None
-    publishedAt: datetime = None
+    created_at: datetime = None
+    updated_at: datetime = None
+    published_at: datetime = None
 
     class Config:
         orm_mode = True

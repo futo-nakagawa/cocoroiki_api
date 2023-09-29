@@ -13,5 +13,5 @@ class Family(Base):
     createdAt = Column(DateTime)
     updatedAt = Column(DateTime)
 
-    user = relationship("AppUser", back_populates="family")
-    relation = relationship("Relation", back_populates="family")
+    # user = relationship("AppUser", back_populates="family")
+    # relation = relationship("Relation", back_populates="family")

@@ -6,7 +6,27 @@ import models, schemas
 #get all user
 def get_user(session: Session):
     users_list = session.query(models.AppUserModel.AppUser).all() # get all users items
-    return users_list 
+    transformed_users = []
+
+    for user in users_list:
+        transformed_user = {
+            "id": user.id,
+            "attributes": {
+                "name": user.name,
+                "email": user.email,
+                "birth": user.birth,
+                "age": user.age,
+                "gender": user.gender,
+                "last_login": user.last_login,
+                "grandparent": user.grandparent,
+                "createdAt": user.created_at,
+                "updatedAt": user.updated_at,
+                "publishedAt": user.published_at
+            }
+        }
+        transformed_users.append(transformed_user)
+
+    return {"data": transformed_users}
 
 #get user by id
 def get_user_by_id(session: Session, id: int):

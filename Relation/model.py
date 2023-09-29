@@ -11,5 +11,5 @@ class Relation(Base):
     user_id = Column(Integer, ForeignKey('Users.id'))
     family_id = Column(Integer, ForeignKey('Families.id'))
 
-    family = relationship("Family", back_populates="relation")
-    user = relationship("AppUser", back_populates="relation")
+    # family = relationship("Family", back_populates="relation")
+    # user = relationship("AppUser", back_populates="relation")

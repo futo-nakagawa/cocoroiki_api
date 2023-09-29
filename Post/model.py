@@ -17,5 +17,5 @@ class Post(Base):
     updatedAt = Column(DateTime)
     publishedAt = Column(DateTime)
 
-    user = relationship("AppUser", back_populates="post")
-    comment = relationship("Comment", back_populates="post")
+    # user = relationship("AppUser", back_populates="post")
+    # comment = relationship("Comment", back_populates="post")
